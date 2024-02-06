@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Crypt;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 
@@ -15,6 +12,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('admin');
     }
 
     /**
@@ -47,9 +45,12 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
 
-        $data = $request->validated();
-        $data['password'] = Crypt::encryptString($request->password);
-        User::create($data);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = encrypt($request->password);
+        $user->role = $request->role;
+        $user->save();
 
         return redirect()->route('user.index')->with('success', 'New user is created successfully');
     }
@@ -74,7 +75,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrfail($id);
-        $user->password = Crypt::decryptString($user->password);
+        $user->password = decrypt($user->password);
         return view('user.edit', compact('user'));
     }
 
@@ -91,7 +92,7 @@ class UserController extends Controller
         $user = User::findOrfail($id);
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->password = Crypt::encryptString($request->password);
+        $user->password = encrypt($request->password);
         $user->role = $request->role;
 
         if ($request->admin == '0') {

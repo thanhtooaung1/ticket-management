@@ -58,32 +58,90 @@
 
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
+
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
+                        @if (Auth::user()->isAdmin())
+                            <li class="nav-item">
+                                <a href="{{ route('user.create') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-user-plus"></i>
+                                    <p>
+                                        Create User
+                                        {{-- <span class="right badge badge-danger">New</span> --}}
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('user.index') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-users"></i>
+                                    <p>
+                                        User List
+                                        {{-- <span class="right badge badge-danger">New</span> --}}
+                                    </p>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="text-gray">
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('category.create') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-plus"></i>
+                                    <p>
+                                        Create Category
+                                        {{-- <span class="right badge badge-danger">New</span> --}}
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('category.index') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-list"></i>
+                                    <p>
+                                        Category List
+                                        {{-- <span class="right badge badge-danger">New</span> --}}
+                                    </p>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="text-gray">
+                            </li>
+
+
+                            <li class="nav-item">
+                                <a href="{{ route('label.create') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-tag"></i>
+                                    <p>
+                                        Create Label
+                                        {{-- <span class="right badge badge-danger">New</span> --}}
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('label.index') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-tags"></i>
+                                    <p>
+                                        Label List
+                                        {{-- <span class="right badge badge-danger">New</span> --}}
+                                    </p>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="text-gray">
+                            </li>
+                        @endif
+
                         <li class="nav-item">
-                            <a href="{{ route('user.create') }}" class="nav-link">
+                            <a href="{{ route('ticket.create') }}" class="nav-link">
                                 <i class="nav-icon fas fa-plus"></i>
                                 <p>
-                                    Create User
-                                    {{-- <span class="right badge badge-danger">New</span> --}}
+                                    Create Ticket
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('user.index') }}" class="nav-link">
-                                <i class="nav-icon fas fa-list"></i>
-                                <p>
-                                    User List
-                                    {{-- <span class="right badge badge-danger">New</span> --}}
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="" class="nav-link">
+                            <a href="{{ route('ticket.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-list"></i>
                                 <p>
                                     Tickets
-                                    {{-- <span class="right badge badge-danger">New</span> --}}
                                 </p>
                             </a>
                         </li>

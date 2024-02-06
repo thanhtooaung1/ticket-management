@@ -50,4 +50,9 @@ class User extends Authenticatable
         if ($this->role == 1) return 'Agent';
         return 'Regular';
     }
+
+    public function isAdmin()
+    {
+        return $this->role == 0;
+    }
 }

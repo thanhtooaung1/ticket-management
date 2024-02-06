@@ -1,7 +1,14 @@
 <?php
 
-use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LabelController;
+use App\Http\Controllers\PriorityController;
+use App\Http\Controllers\TicketController;
+use App\Models\Priority;
+use Illuminate\Routing\RouteGroup;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,10 +23,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('dashboard.index');
-});
+})->middleware('auth')->name('/home');
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::resource('/user', UserController::class);
+Route::resource('/category', CategoryController::class);
+Route::resource('/label', LabelController::class);
+Route::resource('/priority', PriorityController::class);
+Route::resource('/ticket', TicketController::class);
