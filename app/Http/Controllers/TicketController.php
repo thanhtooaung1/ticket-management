@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\User;
 use App\Models\Image;
 use App\Models\Label;
 use App\Models\Ticket;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreTicketRequest;
 
 class TicketController extends Controller
 {
@@ -19,6 +22,10 @@ class TicketController extends Controller
     public function index()
     {
         $tickets = Ticket::all();
+        $user = Auth::user();
+        if ($user->role != 0) {
+            $tickets = Ticket::where('user_id', $user->id)->orwhere('assigned_user_id', $user->id)->get();
+        }
         return view('ticket.index', compact('tickets'));
     }
 
@@ -40,9 +47,10 @@ class TicketController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreTicketRequest $request)
     {
 
+        // return $request;
         $ticket = Ticket::create($request->all());
 
         $ticket->labels()->attach($request->labels);
@@ -68,9 +76,10 @@ class TicketController extends Controller
      * @param  \App\Models\Ticket  $ticket
      * @return \Illuminate\Http\Response
      */
-    public function show(Ticket $ticket)
+    public function show($id)
     {
-        //
+        $ticket = Ticket::findOrfail($id);
+        return view('ticket.detail', compact('ticket'));
     }
 
     /**
@@ -83,8 +92,9 @@ class TicketController extends Controller
     {
         $labels = Label::all();
         $categories = Category::all();
+        $agents = User::where('role', '1')->get();
         $ticket = Ticket::findOrfail($id);
-        return view('ticket.edit', compact('labels', 'categories', 'ticket'));
+        return view('ticket.edit', compact('labels', 'categories', 'ticket', 'agents'));
     }
 
     /**
@@ -100,18 +110,22 @@ class TicketController extends Controller
         $ticket->title = $request->title;
         $ticket->message = $request->message;
         $ticket->priority = $request->priority;
+        $ticket->status = $request->status;
+        if ($request->assigned_user_id) {
+            $ticket->assigned_user_id = $request->assigned_user_id;
+        }
         $ticket->update();
 
         $ticket->labels()->sync($request->labels);
         $ticket->categories()->sync($request->categories);
 
-        foreach ($ticket->images as $image) {
-            Image::find($image->id)->delete();
-            Storage::disk('public')->delete('tickets/' . $image->image);
-        }
-
         $images = $request->images;
         if ($images) {
+            foreach ($ticket->images as $image) {
+                Image::find($image->id)->delete();
+                Storage::disk('public')->delete('tickets/' . $image->image);
+            }
+
             foreach ($images as $image) {
                 $imageName = uniqid("ticket_") . "." . $image->extension();
                 $image->storeAs('public/tickets', $imageName);

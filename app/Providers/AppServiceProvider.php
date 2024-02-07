@@ -23,6 +23,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->app['validator']->extend('min_array_size', function ($attribute, $value, $parameters) {
+
+            $data = $value;
+
+            if (!is_array($data)) {
+                return true;
+            }
+            return count($data) >= $parameters[0];
+        });
     }
 }

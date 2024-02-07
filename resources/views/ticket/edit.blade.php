@@ -49,6 +49,8 @@
 
                         </div>
                     </div>
+
+
                     <div class="row mb-3">
                         <label for="categories" class="col-md-4 col-form-label text-md-end">Categories</label>
                         <div class="col-md-6">
@@ -64,6 +66,26 @@
 
                         </div>
                     </div>
+                    @if (Auth::user()->isAdmin())
+                        <div class="row mb-3">
+                            <label class="col-md-4 col-form-label text-md-end">Assigned User</label>
+                            <div class="col-md-6">
+                                <select class=" form-control" aria-label="Default select example" name="assigned_user_id">
+                                    <option value="">Select agent</option>
+                                    @foreach ($agents as $agent)
+                                        <option value={{ $agent->id }}
+                                            {{ $agent->id == $ticket->assigned_user_id ? 'selected' : '' }}>
+                                            {{ $agent->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('assigned_user_id')
+                                    <span class="text-danger">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                    @endif
                     <div class="row mb-3">
                         <label class="col-md-4 col-form-label text-md-end">Priority</label>
                         <div class="col-md-6">
@@ -74,6 +96,23 @@
                                 @endforeach
                             </select>
                             @error('priority')
+                                <span class="text-danger">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-md-4 col-form-label text-md-end">Status</label>
+                        <div class="col-md-6">
+                            @foreach ([0 => 'Close', 1 => 'Open'] as $key => $value)
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="status" id="inlineRadio1"
+                                        value={{ $key }} {{ $ticket->status == $key ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="inlineRadio1">{{ $value }}</label>
+                                </div>
+                            @endforeach
+                            @error('status')
                                 <span class="text-danger">
                                     <strong>{{ $message }}</strong>
                                 </span>
