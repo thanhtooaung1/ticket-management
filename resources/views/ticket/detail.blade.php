@@ -79,55 +79,89 @@
                 <div class="card">
                     <div class="card-header bg-dark">Comments</div>
                     <div class="p-3">
-                        @foreach ($ticket->comments as $comment)
-                            <div class="mb-3">
-                                <div class="row">
-                                    <div class="col-md-1"><i class="fas fa-user"></i></div>
-                                    <div class="col-md-9">
-                                        <div class="font-weight-bold">{{ $comment->user->name }}</div>
-                                        <div>{{ $comment->message }}</div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        @if (Auth::user()->id == $comment->user->id)
-                                            <form action="{{ route('comment.destroy', $comment->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('delete')
-                                                <button type="submit" onclick="return confirm('Are you sure to delete?')"
-                                                    class="btn text-danger"><i class="fas fa-trash"></i></button>
-                                            </form>
-                                        @endif
+                        <div style="height: 70vh; overflow-y: auto; overflow-x: hidden">
+                            @foreach ($ticket->comments as $comment)
+                                <div class="mb-3">
+                                    <div class="row border-bottom">
+                                        <div class="col-md-1"><i class="fas fa-user"></i></div>
+                                        <div class="col-md-9">
+                                            <div class="font-weight-bold">{{ $comment->user->name }}</div>
+                                            <div>{{ $comment->message }}</div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            @if (Auth::user()->id == $comment->user->id)
+                                                <form action="{{ route('comment.destroy', $comment->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    @method('delete')
+                                                    <button type="submit"
+                                                        onclick="return confirm('Are you sure to delete?')"
+                                                        class="btn text-danger"><i class="fas fa-trash"></i></button>
+                                                </form>
+
+                                                <a type="submit" href="{{ route('comment.edit', $comment->id) }}"
+                                                    class="btn text-warning"><i class="fas fa-pen"></i></a>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
                 </div>
                 @if ($ticket->status == 1)
                     <div class="card">
                         <div class="p-3">
-                            <form method="POST" action="{{ route('comment.store') }}">
-                                @csrf
-                                <input name="ticket_id" type="hidden" value={{ $ticket->id }}>
-                                <div class=" mb-3">
-                                    <div class="">
-                                        <input id="message" type="text"
-                                            class="form-control @error('message') is-invalid @enderror" name="message"
-                                            value="{{ old('message') }}" placeholder="Enter comment">
-                                        @error('message')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+                            @if ($currentComment ?? false)
+                                <form method="POST" action="{{ route('comment.update', $currentComment->id) }}">
+                                    @csrf
+                                    @method('put')
+                                    <input name="ticket_id" type="hidden" value={{ $ticket->id }}>
+                                    <div class=" mb-3">
+                                        <div class="">
+                                            <input id="message" type="text"
+                                                class="form-control @error('message') is-invalid @enderror" name="message"
+                                                value="{{ old('message', $currentComment->message) }}"
+                                                placeholder="Enter comment">
+                                            @error('message')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
 
-                                </div>
-                                <div class="text-right">
-                                    <button type="submit" class="btn btn-primary">
-                                        Send
-                                    </button>
-                                </div>
-                            </form>
+                                    </div>
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-primary">
+                                            Update
+                                        </button>
+                                    </div>
+                                </form>
+                            @else
+                                <form method="POST" action="{{ route('comment.store') }}">
+                                    @csrf
+                                    <input name="ticket_id" type="hidden" value={{ $ticket->id }}>
+                                    <div class=" mb-3">
+                                        <div class="">
+                                            <input id="message" type="text"
+                                                class="form-control @error('message') is-invalid @enderror" name="message"
+                                                value="{{ old('message') }}" placeholder="Enter comment">
+                                            @error('message')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+
+                                    </div>
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-primary">
+                                            Send
+                                        </button>
+                                    </div>
+                                </form>
+                            @endif
+
                         </div>
                     </div>
                 @endif

@@ -11,9 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
 
 class TicketController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -23,7 +28,7 @@ class TicketController extends Controller
     {
         $tickets = Ticket::all();
         $user = Auth::user();
-        if ($user->role != 0) {
+        if (!$user->isAdmin()) {
             $tickets = Ticket::where('user_id', $user->id)->orwhere('assigned_user_id', $user->id)->get();
         }
         return view('ticket.index', compact('tickets'));
@@ -67,7 +72,7 @@ class TicketController extends Controller
         }
 
 
-        return redirect()->route('ticket.index');
+        return redirect()->route('ticket.index')->with('create', 'New ticket is created successfully');
     }
 
     /**
@@ -78,7 +83,11 @@ class TicketController extends Controller
      */
     public function show($id)
     {
+
         $ticket = Ticket::findOrfail($id);
+        if (!($this->checkRouteAccess($ticket))) {
+            return redirect()->route('ticket.index');
+        }
         return view('ticket.detail', compact('ticket'));
     }
 
@@ -90,10 +99,13 @@ class TicketController extends Controller
      */
     public function edit($id)
     {
+        $ticket = Ticket::findOrfail($id);
+        if (!($this->checkRouteAccess($ticket))) {
+            return redirect()->route('ticket.index');
+        }
         $labels = Label::all();
         $categories = Category::all();
         $agents = User::where('role', '1')->get();
-        $ticket = Ticket::findOrfail($id);
         return view('ticket.edit', compact('labels', 'categories', 'ticket', 'agents'));
     }
 
@@ -104,7 +116,7 @@ class TicketController extends Controller
      * @param  \App\Models\Ticket  $ticket
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateTicketRequest $request, $id)
     {
         $ticket = Ticket::findOrfail($id);
         $ticket->title = $request->title;
@@ -137,8 +149,10 @@ class TicketController extends Controller
         }
 
 
-        return redirect()->route('ticket.index');
+        return redirect()->route('ticket.index')->with('update', 'Ticket is updated successfully');
     }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -149,12 +163,24 @@ class TicketController extends Controller
     public function destroy($id)
     {
         $ticket = Ticket::findOrfail($id);
+        if (!($this->checkRouteAccess($ticket))) {
+            return redirect()->route('ticket.index');
+        }
         if ($ticket) {
             foreach ($ticket->images as $image) {
                 Storage::disk('public')->delete('tickets/' . $image->image);
             }
             $ticket->delete();
         }
-        return redirect()->route('ticket.index');
+        return redirect()->route('ticket.index')->with('delete', 'Ticket is deleted successfully');
+    }
+
+    function checkRouteAccess($ticket)
+    {
+        $user = Auth::user();
+        if (!$user->isAdmin() && !($user->id == $ticket->user->id || $user->id == ($ticket->assignedAgent->id ?? 0))) {
+            return false;
+        }
+        return true;
     }
 }

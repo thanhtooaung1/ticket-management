@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCommentRequest;
+use App\Models\Ticket;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreCommentRequest;
 
 class CommentController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('admin');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -51,9 +58,8 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function show(Comment $comment)
+    public function show($id)
     {
-        //
     }
 
     /**
@@ -62,9 +68,12 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Comment $comment)
+    public function edit($id)
     {
-        //
+        $currentComment = Comment::findOrfail($id);
+        $ticket = $currentComment->ticket;
+
+        return view('ticket.detail', compact('ticket', 'currentComment'));
     }
 
     /**
@@ -74,9 +83,12 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Comment $comment)
+    public function update(Request $request, $id)
     {
-        //
+        $comment = Comment::findOrfail($id);
+        $comment->message = $request->message;
+        $comment->update();
+        return redirect()->route('ticket.show', ['ticket' => $comment->ticket]);
     }
 
     /**

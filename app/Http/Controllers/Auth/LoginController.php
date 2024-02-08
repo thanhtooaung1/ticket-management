@@ -48,6 +48,6 @@ class LoginController extends Controller
             return redirect()->back();
         }
         Auth::login($user);
-        return redirect()->route('/home');
+        return redirect()->route('ticket.index');
     }
 }

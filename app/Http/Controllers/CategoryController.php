@@ -48,7 +48,7 @@ class CategoryController extends Controller
         $category = new Category();
         $category->name = $request->name;
         $category->save();
-        return redirect()->route('category.index');
+        return redirect()->route('category.index')->with('create', 'New category is created successfully');
     }
 
     /**
@@ -86,7 +86,7 @@ class CategoryController extends Controller
         $category = Category::findOrfail($id);
         $category->name = $request->name;
         $category->update();
-        return redirect()->route('category.index');
+        return redirect()->route('category.index')->with('update', 'Category is updated successfully');
     }
 
     /**
@@ -101,6 +101,6 @@ class CategoryController extends Controller
         if ($category) {
             $category->delete();
         }
-        return redirect()->route('category.index');
+        return redirect()->route('category.index')->with('delete', 'Category is deleted successfully');
     }
 }

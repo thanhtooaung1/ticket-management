@@ -2,6 +2,7 @@
 
 @section('content')
     <div class="col-md-12">
+        @include('layouts.alert')
         <div class="card">
             <div>
                 <div class="card-header bg-dark">Tickets</div>
